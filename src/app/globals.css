@@ -1,26 +1,66 @@
 @import "tailwindcss";
 
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f2f4f7;
+  --background-btnAccess: #62685E;
+  --base-button-background: #e2e5e9;
+  --foreground: #1F2937;
+  --foreground-title: #62685E;
+  --foreground-subTitle: #817979;
+  --foreground-muted: #6B7280;
+  --color-separator: #dbdbdb;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-separator: var(--color-separator);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-serif: var(--font-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+
+@keyframes like {
+  0% {
+    transform: scale(1);
   }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-like {
+  animation: like 0.3s ease-in-out;
+}
+
+@theme {
+  --breakpoint-sm: 53.3rem;
+  --breakpoint-md: 64rem;
+  --breakpoint-lg: 85.3rem;
+  --breakpoint-xl: 106.6rem;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-serif);
+  height: 100%;
+  overflow: visible;
+
+  .scrollbar-hide::-webkit-scrollbar{
+      display: none;
+  }
 }
