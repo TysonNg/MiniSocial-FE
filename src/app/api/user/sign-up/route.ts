@@ -13,30 +13,33 @@ export async function POST(request: NextRequest) {
     if (!result.data) throw new Error(`${result.data.message}`);
 
     if (result.data) {
-        const {id} = result.data.user
-        const {access_token,refresh_token} = result.data.tokens
-        cookieStore.set("access_token", access_token, {
-          httpOnly: true,
-          maxAge: 60 * 60 * 24,
-        });
-        cookieStore.set("refresh_token", refresh_token, {
-          httpOnly: true,
-          maxAge: 60 * 60 * 24 * 7,
-        });
-        cookieStore.set("userId", id, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
-      
+      const { id } = result.data.user;
+      const { access_token, refresh_token } = result.data.tokens;
+      cookieStore.set("access_token", access_token, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24,
+      });
+      cookieStore.set("refresh_token", refresh_token, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+      });
+      cookieStore.set("userId", id, {
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 7,
+      });
+
       return NextResponse.json({
         metadata: result.data,
-      message: "Register successfully!",
+        message: "Register successfully!",
       });
     }
     return NextResponse.json({ message: "Logout failed" });
   } catch (error: unknown) {
     const err = error as CustomApiError;
     console.error("Login error:", err.message);
-    return {
-      message: err.message,
-      status: err.status || 500,
-    };
+    return NextResponse.json({
+        message: err.message,
+        status: err.status || 500,
+      });
   }
 }

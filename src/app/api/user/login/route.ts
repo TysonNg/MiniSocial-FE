@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 7,
       });
-      
+
       return NextResponse.json({
         metadata: result.data,
         message: "Login successfully!",
@@ -37,9 +37,9 @@ export async function POST(request: NextRequest) {
   } catch (error: unknown) {
     const err = error as CustomApiError;
     console.error("Login error:", err.message);
-    return {
+    return NextResponse.json({
       message: err.message,
       status: err.status || 500,
-    };
+    });
   }
 }
