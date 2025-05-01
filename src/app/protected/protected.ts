@@ -6,7 +6,6 @@ import { redirect } from "next/navigation";
 
 export async function InstanceApi() {
   const cookieStore = await cookies();
-  const userId = cookieStore.get("userId")?.value;
 
   console.log('NEXT_PUBLIC_API_URL',process.env.NEXT_PUBLIC_API_URL);
   console.log('api-url',process.env.API_URL);
@@ -17,13 +16,16 @@ export async function InstanceApi() {
     timeout: 30000,
     headers: {
       "Content-Type": "application/json",
-      "x-user-id": userId,
     },
   });
 
   api.interceptors.request.use((config) => {
     const token = cookieStore.get('access_token')?.value
     if(token) config.headers.Authorization = `Bearer ${token}`;
+    const userId = cookieStore.get("userId")?.value;
+    if (userId) {
+      config.headers["x-user-id"] = userId;
+    }
     return config;
   },async(err) => {
     return Promise.reject(err)
