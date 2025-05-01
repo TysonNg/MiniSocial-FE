@@ -1,6 +1,5 @@
 import { CustomApiError } from "@/app/features/users/actions/access.action";
 import { InstanceApi } from "@/app/protected/protected";
-import { AxiosError } from "axios";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
