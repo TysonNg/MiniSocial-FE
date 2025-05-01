@@ -10,28 +10,25 @@ export async function POST(request: NextRequest) {
   const payload = JSON.parse(await request.text());
   const cookieStore = await cookies();
   try {
-    const result = await api.post("/auth/signIn", payload);
+    const result = await api.post("/auth/signUp", payload);
     if (!result.data) throw new Error(`${result.data.message}`);
 
     if (result.data) {
-      const { access_token, refresh_token } = result.data.tokens;
-      const { id } = result.data.user;
-      cookieStore.set("access_token", access_token, {
-        httpOnly: true,
-        maxAge: 60 * 60 * 24,
-      });
-      cookieStore.set("refresh_token", refresh_token, {
-        httpOnly: true,
-        maxAge: 60 * 60 * 24 * 7,
-      });
-      cookieStore.set("userId", id, {
-        httpOnly: true,
-        maxAge: 60 * 60 * 24 * 7,
-      });
+        const {id} = result.data.user
+        const {access_token,refresh_token} = result.data.tokens
+        cookieStore.set("access_token", access_token, {
+          httpOnly: true,
+          maxAge: 60 * 60 * 24,
+        });
+        cookieStore.set("refresh_token", refresh_token, {
+          httpOnly: true,
+          maxAge: 60 * 60 * 24 * 7,
+        });
+        cookieStore.set("userId", id, { httpOnly: true, maxAge: 60 * 60 * 24 * 7 });
       
       return NextResponse.json({
         metadata: result.data,
-        message: "Login successfully!",
+      message: "Register successfully!",
       });
     }
     return NextResponse.json({ message: "Logout failed" });

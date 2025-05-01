@@ -104,11 +104,15 @@ export function FormSignUp(){
         e.preventDefault();
         setIsLoading(true);
         try {
-          const result = await SignUpAction(formSignUp);
-          if(result.message === 'Register successfully!' || result.message === 'User already registed!!!'){
-            setMessage([result.message])
+          const result = await fetch('/api/user/sign-up',{
+            method:"POST",
+            body: JSON.stringify(formSignUp)
+          });
+          const data = await result.json()
+          if(data.message === 'Register successfully!' || data.message === 'User already registed!!!'){
+            setMessage([data.message])
            
-            if(result.message === 'Register successfully!'){
+            if(data.message === 'Register successfully!'){
                 localStorage.setItem('username', formSignUp.name??"");
                 setTimeout(() => {
                     router.push('/home');
