@@ -23,16 +23,19 @@ export function FormLogin() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const result = await LoginAction(formLogin);
+      const res = await fetch('/api/user/login',{
+        method: "POST",
+        body: JSON.stringify(formLogin)
+      });
+      const data = await res.json()
+      if(data){
+        login(data.metadata.user.id)
       
-      if(result){
-        login(result.metadata.user.id)
-      
-        if(result.message === 'Login successfully!' || result.message === 'Pls check email or password'){
-          setMessage([result.message])
+        if(data.message === 'Login successfully!' || data.message === 'Pls check email or password'){
+          setMessage([data.message])
         }
-        if(result.message === 'Login successfully!'){
-          localStorage.setItem('username', result.metadata.user.name);
+        if(data.message === 'Login successfully!'){
+          localStorage.setItem('username', data.metadata.user.name);
           setTimeout(() => {
               router.push('/home');
           }, 1000);
