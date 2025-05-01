@@ -26,7 +26,7 @@ export const useSocket = () => {
         const user:UserInterface = await resUser.json()
         if(!user) return;
 
-        const socket = io("http://localhost:9000", {
+        const socket = io("https://minisocial-be.onrender.com/", {
           auth: {
             token,
             userId,
