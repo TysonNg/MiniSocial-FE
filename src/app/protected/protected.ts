@@ -37,7 +37,9 @@ export async function InstanceApi() {
     const originalRequest = err.config
     console.log('orinalll', err);
     
-    if(err.response.status === 401 && err.response.statusText === 'Unauthorized'  && !originalRequest._retry){
+    const status = err?.response?.status;
+    const statusText = err?.response?.statusText;
+    if(status === 401 && statusText === 'Unauthorized'  && !originalRequest._retry){
       originalRequest._retry = true
 
       const refreshToken = cookieStore.get('refresh_token')?.value
