@@ -35,7 +35,7 @@ export async function InstanceApi() {
   },async(err) => {
     
     const originalRequest = err.config
-    console.log('orinalll', err);
+    console.log('orinalll', err.response);
     
     const status = err?.response?.status;
     const statusText = err?.response?.statusText;
