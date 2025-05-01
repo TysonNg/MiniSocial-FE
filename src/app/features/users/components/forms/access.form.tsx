@@ -27,6 +27,8 @@ export function FormLogin() {
         body: JSON.stringify(formLogin)
       });
       const data = await res.json()
+      console.log('login data',data);
+      
       if(data){
         login(data.metadata.user.id)
       
