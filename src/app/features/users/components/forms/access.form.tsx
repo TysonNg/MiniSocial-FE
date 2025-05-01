@@ -1,6 +1,6 @@
 "use client";
 
-import { LoginAction, SignUpAction } from "@/app/features/users/actions/access.action";
+import {  SignUpAction } from "@/app/features/users/actions/access.action";
 import BtnLogin, { BtnSignUp } from "../buttons/btnAccess";
 import { UserLoginInterface, UserSignUpInterface } from "../../interfaces/access.interface";
 import { useState } from "react";
