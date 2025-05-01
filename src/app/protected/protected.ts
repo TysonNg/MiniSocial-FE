@@ -65,7 +65,7 @@ export async function InstanceApi() {
       }
     }
     return Promise.reject({
-      message: err?.response?.data?.message || "Something went wrong",
+      message:err?.response?.data?.message || err?.message || "Something went wrong",
       status: err?.response?.status || 500,
       raw: err,
     })
