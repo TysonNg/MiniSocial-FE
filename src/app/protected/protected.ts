@@ -1,6 +1,5 @@
 import axios from "axios";
-import dotenv from "dotenv";
-dotenv.config();
+
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
