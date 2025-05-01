@@ -13,7 +13,7 @@ export async function InstanceApi() {
   const baseURL = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL;
   console.log("Final baseURL:", baseURL);
   const api = axios.create({
-    baseURL: process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL,
+    baseURL: "https://minisocial-be.onrender.com/api/v1",
     timeout: 10000,
     headers: {
       "Content-Type": "application/json",
