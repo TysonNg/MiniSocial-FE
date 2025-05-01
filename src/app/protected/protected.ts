@@ -8,6 +8,9 @@ export async function InstanceApi() {
   const cookieStore = await cookies();
   const userId = cookieStore.get("userId")?.value;
 
+  console.log('NEXT_PUBLIC_API_URL',process.env.NEXT_PUBLIC_API_URL);
+  console.log('api-url',process.env.API_URL);
+
   
   const api = axios.create({
     baseURL: `${process.env.NEXT_PUBLIC_API_URL??process.env.API_URL}`,
