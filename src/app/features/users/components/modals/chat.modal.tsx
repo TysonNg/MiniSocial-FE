@@ -1,14 +1,26 @@
 "use client";
 import { useModal } from "@/app/context/modal.context";
-import { useSocket } from "@/app/hooks/useSocket.hook";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { ChatInterface } from "../../interfaces/chat.interface";
-import { doc, onSnapshot } from "firebase/firestore";
+import { DataChat } from "../../interfaces/chat.interface";
+import {
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import db from "@/app/ultils/lib/firebase";
 import Link from "next/link";
+import { useChatSocket } from "@/app/hooks/useChatSocket.hook";
+import { AuthSocket } from "@/app/shared/header/notify/notify.component";
+import {
+  formatTime,
+  formatTimeToMinuteAndHour,
+} from "@/app/ultils/format-time.ultil";
 
 type DataMessageRevice = {
   user: {
@@ -24,13 +36,13 @@ export default function ChatModal() {
   const { isChatModal, selectedUser, closeChatModal, openChatModalWithUser } =
     useModal();
   const [message, setMessage] = useState<string>("");
-  const [messagesHistory, setMessagesHistory] = useState<ChatInterface[]>([]);
-  const { socket } = useSocket();
+  const [messagesHistory, setMessagesHistory] = useState<DataChat[]>([]);
+  const { socket } = useChatSocket();
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const [userStatus, setUserStatus] = useState<string>("offline"); 
+  const [userStatus, setUserStatus] = useState<string>("offline");
   const unsubscribeRef = useRef<(() => void)[]>([]);
-
-
+  const [myId, setMyId] = useState<string>();
+  const refStyleBorder = useRef<string>("");
   const handleSendMessage = () => {
     if (message.trim() === "") return;
 
@@ -38,11 +50,54 @@ export default function ChatModal() {
       toUserId: `${selectedUser?.id}`,
       message: `${message}`,
     });
+    socket?.emit("markMessagesAsRead", {
+      toId: selectedUser?.id,
+    });
     setMessage("");
-    document.dispatchEvent(new Event("newMessage"));
+    window.dispatchEvent(new Event("newMessage"));
   };
 
- 
+  const fetchMessage = async (fromId: string, toId: string) => {
+    const chatKey = [fromId, toId].sort().join("_");
+    const q = query(
+      collection(db, "messages"),
+      where("chatKey", "==", chatKey),
+      orderBy("timestamp", "asc")
+    );
+
+    const unsubcribe = onSnapshot(q, (snapshot) => {
+      if (snapshot.empty) {
+        setMessagesHistory([]);
+      } else {
+        const messages: DataChat[] = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data() as DataChat;
+
+          messages.push({
+            fromId: data.fromId,
+            fromUrl: data.fromUrl,
+            fromUserName: data.fromUserName,
+            message: data.message,
+            toId: data.toId,
+            chatKey: data.chatKey,
+            readBy: data.readBy,
+            chatParticipants: data.chatParticipants,
+            isRead: data.isRead,
+            timestamp: data.timestamp,
+          });
+        });
+        setMessagesHistory(messages);
+      }
+    });
+
+    return unsubcribe;
+  };
+
+  const markAsRead = () => {
+    socket?.emit("markMessagesAsRead", {
+      toId: selectedUser?.id,
+    });
+  };
 
   useEffect(() => {
     if (selectedUser) {
@@ -51,10 +106,9 @@ export default function ChatModal() {
       const unsubscribe = onSnapshot(userActive, (docsnap) => {
         if (docsnap.exists()) {
           const data = docsnap.data();
-          setUserStatus(data?.status || "offline"); 
+          setUserStatus(data?.status || "offline");
         }
       });
-
       unsubscribeRef.current.push(unsubscribe);
 
       return () => {
@@ -62,11 +116,14 @@ export default function ChatModal() {
       };
     }
   }, [selectedUser]);
-  
 
   useEffect(() => {
     if (!socket) return;
     setMessagesHistory([]);
+
+    const { userId } = socket.auth as AuthSocket;
+    setMyId(userId);
+    const unsubFetchMessage = fetchMessage(userId, selectedUser?.id ?? "");
 
     const handleReceivePrivateMessage = (data: DataMessageRevice) => {
       if (!isChatModal) {
@@ -79,44 +136,13 @@ export default function ChatModal() {
           name: data.user.userName,
         });
       }
-
-      if (data.user.fromId === selectedUser?.id) {
-        setMessagesHistory((prev) => [
-          ...prev,
-          {
-            fromId: data.user.fromId,
-            fromUrl: data.user.imgUrl,
-            fromUserName: data.user.userName,
-            message: data.message,
-            toId: data.user.toId,
-          },
-        ]);
-      }
-    };
-    const handleGetAllMessagesHistory = () => {
-      socket?.emit("getHistoryPrivateMessages", selectedUser?.id);
     };
 
     socket?.on("privateMessage", handleReceivePrivateMessage);
 
-    socket?.on("historyMessagesSent", (data) => {
-      setMessagesHistory(data.historyMessages);
-    });
-
-    if (isChatModal && selectedUser) {
-      socket?.emit("markMessagesAsRead", {
-        toId: selectedUser.id,
-      });
-
-      handleGetAllMessagesHistory();
-      document.addEventListener("newMessage", handleGetAllMessagesHistory);
-    }
-
     return () => {
-      socket.off("historyMessagesSent");
-      socket.off("privateMessage");
-
-      document.removeEventListener("newMessage", handleGetAllMessagesHistory);
+      socket.off("privateMessage", handleReceivePrivateMessage);
+      unsubFetchMessage.then((unsubscribe) => unsubscribe());
     };
   }, [socket, isChatModal, selectedUser]);
 
@@ -126,12 +152,12 @@ export default function ChatModal() {
     }
   }, [messagesHistory]);
 
-
-  
-
   if (isChatModal) {
     return (
-      <div className="fixed bottom-0 right-30 w-full h-full max-w-[338px] max-h-[570px] bg-white shadow-xl rounded-t-xl">
+      <div
+        className={`fixed bottom-0 right-30 w-full h-full max-w-[338px] max-h-[570px] bg-white shadow-xl rounded-t-xl ${refStyleBorder.current}`}
+        onClick={() => markAsRead()}
+      >
         {/* Chat Header */}
         <div className="flex flex-row items-center justify-between  border-b border-[var(--color-separator)] p-2 shadow">
           <div className="flex flex-row items-center gap-2">
@@ -156,45 +182,94 @@ export default function ChatModal() {
 
           <div
             className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#e6e6e6] cursor-pointer"
-            onClick={closeChatModal}
+            onClick={(e) => {
+              closeChatModal();
+              e.stopPropagation();
+            }}
           >
             <div className=" text-xl">X</div>
           </div>
         </div>
 
         {/* Chat Body */}
-        <div className="w-full h-full max-h-[461px] py-2 bg-white overflow-y-auto">
-          {messagesHistory.map((message, i) => (
-            <div
-              key={i}
-              className={`${
-                message.fromId !== selectedUser?.id ? "place-self-end " : ""
-              } flex flex-row p-1 gap-2 `}
-            >
-              <div
-                className={`${
-                  message.fromId !== selectedUser?.id ? "hidden" : ""
-                } w-8 h-8 relative rounded-full`}
-                title={message.fromUserName}
-              >
-                <Image
-                  src={message.fromUrl}
-                  className="rounded-full object-cover"
-                  fill
-                  alt="avatar"
-                />
-              </div>
-              <div
-                className={`${
-                  message.fromId !== selectedUser?.id
-                    ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white"
-                    : "bg-gradient-to-br from-gray-300 to-gray-400 text-black"
-                } rounded-3xl  p-2 text-sm`}
-              >
-                {message.message}
-              </div>
-            </div>
-          ))}
+        <div className="w-full h-full max-h-[461px] content-end py-2 bg-white overflow-y-auto">
+          {myId &&
+            messagesHistory.map((message, i) => {
+              const isSeen = message.readBy.includes(selectedUser?.id ?? "");
+              const indexLastMessage = messagesHistory.length - 1;
+              const lastMessage = messagesHistory[messagesHistory.length - 1];
+              let messageStatus = isSeen
+                ? "seen"
+                : `sent ${formatTime(
+                    new Date(message.timestamp.seconds * 1000).toString()
+                  )} ago`;
+
+              if (!message.readBy.includes(myId)) {
+                refStyleBorder.current = "border border-[#b5b5b5]";
+                messageStatus = "";
+              } else if (lastMessage.fromId !== myId) {
+                messageStatus = "";
+              } else {
+                refStyleBorder.current = "";
+              }
+              return (
+                <div
+                  key={i}
+                  className={`${
+                    message.fromId !== selectedUser?.id ? "place-self-end " : ""
+                  } flex flex-row p-1 gap-2 `}
+                >
+                  <div
+                    className={`${
+                      message.fromId !== selectedUser?.id ? "hidden" : ""
+                    } w-8 h-8 relative rounded-full`}
+                    title={message.fromUserName}
+                  >
+                    <Image
+                      src={message.fromUrl}
+                      className="rounded-full object-cover"
+                      fill
+                      alt="avatar"
+                    />
+                  </div>
+
+                  <div className="flex flex-col items-end">
+                    <div
+                      className={`${
+                        message.fromId !== selectedUser?.id
+                          ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white"
+                          : "bg-gradient-to-br from-gray-300 to-gray-400 text-black"
+                      } rounded-3xl  p-2 text-sm w-fit`}
+                      title={formatTimeToMinuteAndHour(
+                        new Date(message.timestamp.seconds * 1000)
+                      )}
+                    >
+                      {message.message}
+                    </div>
+                    {i === indexLastMessage && (
+                      <div className="flex flex-row gap-1 mt-1.5">
+                        <p className="text-sm text-gray-500 ">
+                          {" "}
+                          {messageStatus}
+                        </p>
+                        {messageStatus.startsWith("seen") ? (
+                          <div className="w-5 h-5 relative rounded-full" title={`${selectedUser?.name} have been seen message`}>
+                            <Image
+                              src={selectedUser?.avatarUrl ?? ""}
+                              fill
+                              alt="avatar-selectuser"
+                              className="rounded-full"
+                            />
+                          </div>
+                        ) : (
+                          ""
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           <div ref={bottomRef} />
         </div>
 

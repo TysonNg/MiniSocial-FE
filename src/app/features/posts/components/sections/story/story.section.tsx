@@ -1,7 +1,7 @@
 "use client";
 import { useModal } from "@/app/context/modal.context";
 import { UserInterface } from "@/app/features/users/interfaces/user.interface";
-import formatTime from "@/app/ultils/format-time.ultil";
+import {formatTime} from "@/app/ultils/format-time.ultil";
 import {
   faAngleLeft,
   faAngleRight,
@@ -164,7 +164,6 @@ export default function StorySection() {
       document.removeEventListener("newStory", fetchStories);
     };
   }, [isStoryModalOpen]);
-  console.log("stories", stories);
 
   return (
     <div className="relative">

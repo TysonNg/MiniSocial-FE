@@ -7,6 +7,7 @@ import PostModal from "../../modal/post-modal";
 import LikeModal from "../../modal/like-modal";
 import { usePathname } from "next/navigation";
 
+
 export default function NewsfeedSection() {
   const [posts, setPosts] = useState<PostInterface[]>([]);
   const [cursor, setCursor] = useState<string | null>("");
@@ -89,6 +90,7 @@ export default function NewsfeedSection() {
     };
   }, [pathname]);
 
+ 
   useEffect(() => {
     const handleScroll = () => {
       const isBottom =
@@ -107,7 +109,7 @@ export default function NewsfeedSection() {
       <div className="w-full flex flex-col gap-4">
         {posts.map((post, i) => {
           return (
-            <div key={post.postId}>
+            <div key={post.postId} className="relative">
               <PostItem post={post} i={i} />
             </div>
           );

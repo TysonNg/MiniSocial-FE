@@ -19,8 +19,8 @@ export function ShowMoreText({ text, maxChars}: ShowMoreTextProps) {
     <span className="text-sm ml-1">
     {displayText}
     {!expand && text.length>120? <span>...</span>:<></>}
-    <button className={`${expand || text.length < 120? 'hidden':''} text-sky-500 cursor-pointer font-bold`} onClick={handleMoreText}>more</button>
-    <button className={`${!expand || text.length < 120? 'hidden':''} pl-2 text-sky-500 cursor-pointer font-bold`} onClick={handleMoreText}>less more</button>
+    <button className={`${expand || text.length < 120? 'hidden':''} text-[#4b4b4b] cursor-pointer font-bold`} onClick={handleMoreText}>more</button>
+    <button className={`${!expand || text.length < 120? 'hidden':''} pl-2 text-[#4b4b4b] cursor-pointer font-bold`} onClick={handleMoreText}>less more</button>
 
     </span>
   )

@@ -2,17 +2,30 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  images:{
-    domains: ['cdn.pixabay.com','static.vecteezy.com','res.cloudinary.com']
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.pixabay.com",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "static.vecteezy.com",
+      },
+    ],
   },
-  async rewrites(){
+  async rewrites() {
     return [
       {
-        source: '/',
-        destination: '/home',
-      }
-    ]
-  }
+        source: "/",
+        destination: "/home",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

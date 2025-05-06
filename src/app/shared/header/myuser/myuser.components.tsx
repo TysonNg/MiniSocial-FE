@@ -42,6 +42,17 @@ export default function MyUserComponent() {
 
   useEffect(() => {
     fetchUser();
+
+    window.addEventListener('openNotifications',() => {
+      closeModal()
+    })
+
+    return(() => {
+      window.removeEventListener('openNotifications',() => {
+        closeModal()
+      })
+  
+    })
   }, []);
 
   if (user) {
@@ -54,7 +65,7 @@ export default function MyUserComponent() {
           onClick={closeModal}
         ></div>
         <div
-          className="w-10 h-10 relative rounded-full  p-5 flex items-center justify-center  "
+          className="w-5 h-5 p-4 md:w-10 md:h-10 md:p-5 relative rounded-full   flex items-center justify-center  "
           title="My account"
         >
           <Image
@@ -68,10 +79,10 @@ export default function MyUserComponent() {
           <div
             className={`${
               isModalOpen ? "" : "hidden"
-            } absolute top-11 right-0 p-2 h-[300px] w-[300px] rounded-md shadow-xl border-[#f9f9f9] bg-[#f9f9f9] z-1`}
+            } absolute top-11 right-0 p-2 h-[300px] w-[200px] xs:w-[300px] rounded-md shadow-xl border-[#f9f9f9] bg-[#f9f9f9] z-1`}
           >
             <div className=" w-full">
-              <ul className="flex flex-col content-end gap-3">
+              <ul className="flex flex-col content-end gap-3 text-sm xs:text-base">
                 <li
                   className=" bg-white rounded-md shadow-sm p-1"
                   onClick={closeModal}

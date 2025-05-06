@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import formatTime from "@/app/ultils/format-time.ultil";
+import {formatTime} from "@/app/ultils/format-time.ultil";
 import { CommentNode } from "@/app/ultils/comment-tree.ultil";
 import { useReply } from "@/app/context/reply.context";
 import { useRouter } from "next/navigation";
 import { useModal } from "@/app/context/modal.context";
+
 
 export default function PostReply({
   comment,
@@ -17,19 +18,21 @@ export default function PostReply({
   const { replyComment } = useReply();
   const router = useRouter()
   const {closePostModal} =  useModal()
-  
   const handleReply = () => {
     replyComment({
       comment: {
         parent_comment_id: comment.commentId,
         postId: comment.postId,
         content: `@${comment.name || "user"}`,
+        fromUserId: comment.userId
       },
       user: {
         avatarUrl: comment.avatarUrl ?? "",
         name: comment.name ?? "",
       },
     });
+
+  
     focusTextarea();
   };
 

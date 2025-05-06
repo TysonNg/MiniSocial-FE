@@ -117,7 +117,7 @@ export default function FollowModal({
   if (isFollowModal) {
     return (
       <div className="fixed inset-0  w-full h-full z-100 bg-black/30">
-        <div className="w-100 h-100 fixed inset-0 mx-auto my-auto bg-white z-101">
+        <div className="w-70 h-fit max-h-70 sm:w-100 sm:max-h-100 fixed inset-0 mx-auto my-auto bg-white z-101">
           <div className="relative flex flex-col overflow-y-auto">
             <h1 className="font-bold w-full mt-4 pb-2 text-center border-b border-[var(--color-separator)]">
               {title}
@@ -161,7 +161,7 @@ export default function FollowModal({
                             isMyFollowed(user.id, "Followings")
                               ? "bg-[#403f3f]"
                               : "bg-blue-600"
-                          } px-5 py-1 cursor-pointer hover:opacity-65 rounded-md text-white text-sm`}
+                          } px-5 py-1 cursor-pointer hover:opacity-65 rounded-md text-white text-xs sm:text-sm`}
                         >
                           <button
                             className="cursor-pointer"
@@ -194,7 +194,7 @@ export default function FollowModal({
                             isMyFollowed(user.id, "Followings")
                               ? "bg-[#403f3f]"
                               : "bg-blue-600"
-                          } px-5 py-1 cursor-pointer hover:opacity-65 rounded-md text-white text-sm`}
+                          } flex items-center justify-center px-5 py-1 cursor-pointer hover:opacity-65 rounded-md text-white text-xs sm:text-sm`}
                         >
                           <button
                             className="cursor-pointer"
@@ -215,9 +215,6 @@ export default function FollowModal({
                                 : "Follow Back"}
                             </span>
                             )}
-
-                            
-
                           </button>
                         </div>
                       )}

@@ -33,7 +33,7 @@ export default function SearchBar() {
 
 
   return (
-    <div className="col-span-4 w-[630px] relative ml-25 z-1">
+    <div className="col-span-4 hidden xs:block max-w-[100px] sm:max-w-[130px] sm:ml-10 md:max-w-[630px] md:ml-25  relative   z-1">
       <input
         onChange={handleChange}
         type="text"

@@ -28,6 +28,7 @@ export function ReplyProvider({children} : {children: React.ReactNode}){
             content: '',
             parent_comment_id: '',
             postId: '',
+            fromUserId: '',
         },
         user:{
             name: '',
@@ -42,7 +43,8 @@ export function ReplyProvider({children} : {children: React.ReactNode}){
             comment: {
                 content: commentPayload.comment.content,
                 parent_comment_id: commentPayload.comment.parent_comment_id,
-                postId: commentPayload.comment.postId
+                postId: commentPayload.comment.postId,
+                fromUserId: commentPayload.comment.fromUserId
             },
             user: {
                 name: commentPayload.user.name,

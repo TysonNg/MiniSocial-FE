@@ -2,24 +2,23 @@ import { InstanceApi } from "@/app/protected/protected";
 import { AxiosError } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) {
+export async function DELETE(request: NextRequest) {
   const api = await InstanceApi();
 
-  const body = await request.text();
-  const storyPayload = JSON.parse(body);
+  const postId = await request.text()
   
   try {
-    const result = await api.post(`/story`, 
-        storyPayload,
-    );
+    const result = await api.delete(`/post/delete/${postId}`);
     if (result.data) {
+        console.log('resullll',result.data);
+        
       return NextResponse.json(result.data);
     }
-    return NextResponse.json({ message: "createStory failed" });
+    return NextResponse.json({ message: "fetchAllPosts failed" });
   } catch (error: unknown) {
     if (error instanceof AxiosError && error.response) {
       return NextResponse.json(
-        { message: error.response.data?.message || "creatStory error" },
+        { message: error.response.data?.message || "fetchAllPosts error" },
         { status: error.response.status || 500 }
       );
     }

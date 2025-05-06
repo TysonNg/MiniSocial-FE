@@ -4,7 +4,7 @@ import { io, Socket } from "socket.io-client";
 import { useAuth } from "../context/auth.context";
 import { UserInterface } from "../features/users/interfaces/user.interface";
 
-export const useSocket = () => {
+export const useChatSocket = () => {
   const socketRef = useRef<Socket | null>(null);
   const [connected, setConnected] = useState(false);
   const { userId } = useAuth();
@@ -14,6 +14,7 @@ export const useSocket = () => {
     const connectSocket = async () => {
       try {
         const res = await fetch(`api/user/get-my-user`);
+
         const data = await res.json();
 
         const { token, userId } = data;
@@ -22,21 +23,29 @@ export const useSocket = () => {
           console.error("No token or userId found");
           return;
         }
-        const resUser = await fetch(`api/user/find-user-by-id?userId=${userId}`)
-        const user:UserInterface = await resUser.json()
-        if(!user) return;
+        const resUser = await fetch(
+          `api/user/find-user-by-id?userId=${userId}`
+        );
+        const user: UserInterface = await resUser.json();
+        if (!user) return;
 
-        const socket = io("https://minisocial-be.onrender.com/", {
-          auth: {
-            token,
-            userId,
-            url: user.avatarUrl,
-            userName: user.name
-          },
-          transports: ["websocket"],
-          autoConnect: true,
-          withCredentials: true
-        });
+        const socket = io(
+          `${
+            process.env.NEXT_PUBLIC_SOCKET_URL ||
+            "https://minisocial-be.onrender.com"
+          }/chat`,
+          {
+            auth: {
+              token,
+              userId,
+              url: user.avatarUrl,
+              userName: user.name,
+            },
+            transports: ["websocket"],
+            autoConnect: true,
+            withCredentials: true,
+          }
+        );
 
         socketRef.current = socket;
 
@@ -60,9 +69,11 @@ export const useSocket = () => {
 
     connectSocket();
     return () => {
+      
       socketRef.current?.disconnect();
     };
   }, [userId]);
+
   
   return {
     socket: socketRef.current,

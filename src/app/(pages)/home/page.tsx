@@ -12,19 +12,18 @@ export default async function HomePage() {
   return (
     <>
       <section className="w-full flex flex-col gap-5 mt-5">
-        <section className="w-[630px] mx-auto bg-white rounded-2xl  relative">
+        <section className="w-full max-w-[350px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[580px] xl:max-w-[630px] mx-auto bg-white rounded-2xl  relative">
           <StorySection />
           <StoryWrapper />
         </section>
 
-        <section className="w-[630px] mx-auto bg-white rounded-2xl ">
+        <section className="w-full max-w-[350px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[580px] xl:max-w-[630px] mx-auto bg-white rounded-2xl ">
           <CreatePostSection />
         </section>
 
-        <section className="w-[630px] mx-auto bg-white rounded-2xl">
+        <section className="w-full max-w-[350px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[580px] xl:max-w-[630px] mx-auto bg-white rounded-2xl">
           <NewsfeedSection />
         </section>
-        {/* <ChatModule /> */}
       </section>
     </>
   );

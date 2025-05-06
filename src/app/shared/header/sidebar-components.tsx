@@ -77,18 +77,18 @@ export default function LeftSidebarComponents() {
   
 
   return (
-    <div>
+    <div className="hidden xs:w-[50px] xs:block" >
       <FontAwesomeIcon
         icon={faBars}
         size="xl"
-        className="w-10 h-10 text-[var(--foreground-subTitle)] cursor-pointer"
+        className="w-4 h-4 sm:w-6 sm:h-6 lg:w-10 lg:h-10 text-[var(--foreground-subTitle)] cursor-pointer "
         onMouseEnter={handleOpenSidebar}
         onMouseLeave={handleCloseSidebar}
       />
       <div
         className={`${
           isOpenSidebar ? "translate-x-0" : "-translate-x-20"
-        } absolute bg-white h-[100vh] w-[70px] top-13 left-0 shadow-2xl transition-transform duration-500`}
+        } absolute bg-white h-[100vh]   top-13 left-0 shadow-2xl transition-transform duration-500`}
         onMouseEnter={handleOpenSidebar}
         onMouseLeave={handleCloseSidebar}
       >
@@ -190,14 +190,14 @@ export function RightSidebarComponents() {
 
   return (
     <div
-      className="absolute bg-white h-[100vh] w-[90px] top-13 right-0 shadow-md"
+      className="absolute bg-white h-[100vh] hidden sm:w-[90px] xs:w-[50px] xs:block top-13 right-0 shadow-md"
       onClick={closeModal}
     >
       <div className="flex flex-col gap-10 mt-10 items-center">
         {users.map((user, index) => (
           <div
             key={index}
-            className="w-10 h-10 p-5 relative cursor-pointer"
+            className="w-5 h-5 sm:w-10 sm:h-10 p-5 relative cursor-pointer"
             title={user.name}
             onClick={() => openChatModal(user)}
           >

@@ -115,16 +115,16 @@ export default function CreatePostModal({ user }: { user: UserInterface }) {
         onClick={cancleCreatePost}
       >
         <div
-          className="fixed inset-0 w-[500px] h-[630px] flex flex-col mx-auto my-auto bg-white z-101 rounded-md "
+          className="fixed inset-0 w-full h-screen max-w-[300px] max-h-[530px] sm:max-w-[500px] sm:max-h-[630px] flex flex-col mx-auto my-auto bg-white z-101 rounded-md "
           onClick={(e) => e.stopPropagation()}
         >
           <div className="py-5 relative border-b border-[var(--color-separator)]">
-            <h1 className="place-self-center font-bold text-xl">Create Post</h1>
+            <h1 className="place-self-center font-bold text-sm sm:text-xl">Create Post</h1>
             <div
               className="absolute w-8 h-8 flex justify-center items-center top-4 right-3 p-1 rounded-full bg-[var(--base-button-background)] cursor-pointer"
               onClick={cancleCreatePost}
             >
-              <button className=" text-xl cursor-pointer">X</button>
+              <button className=" text-xs sm:text-xl cursor-pointer">X</button>
             </div>
           </div>
 
@@ -138,7 +138,7 @@ export default function CreatePostModal({ user }: { user: UserInterface }) {
                   className="rounded-full"
                 />
               </div>
-              <p className="font-bold text-sm">{user.name}</p>
+              <p className="font-bold text-xs sm:text-sm">{user.name}</p>
             </div>
 
             {/* text */}
@@ -161,7 +161,7 @@ export default function CreatePostModal({ user }: { user: UserInterface }) {
                       <div className="w-5 h-5 rounded-full bg-[#e65a5d] flex flex-row justify-center items-center absolute top-0 right-0 cursor-pointer hover:opacity-70"
                       onClick={() => handleDeleteUploadImage(img.publicId,i)}
                       >
-                        <button className="text-white cursor-pointer">X</button>
+                        <button className="text-white cursor-pointer text-xs sm:text-sm">X</button>
                       </div>
                     </div>
                   ))}
@@ -195,7 +195,7 @@ export default function CreatePostModal({ user }: { user: UserInterface }) {
               </CldUploadWidget>
             </div>
 
-            <div className="w-full max-w-[468px] py-3 rounded-md cursor-pointer bg-[#3c68fd] flex justify-center text-sm text-white font-bold hover:opacity-80"
+            <div className="w-full max-w-[468px] py-3 rounded-md cursor-pointer bg-[#3c68fd] flex justify-center text-xs sm:text-sm text-white font-bold hover:opacity-80"
             onClick={() => handlePost(post)}>
               <button>{isLoading? <BtnLoading/> : "Post"} </button>
             </div>

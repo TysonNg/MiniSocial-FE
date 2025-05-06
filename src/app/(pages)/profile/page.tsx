@@ -129,10 +129,10 @@ export default function ProfilePage() {
   },[pathname])
 
   return (
-    <div className="w-full max-w-[1200px] h-fit mx-auto flex flex-col  gap-5 mt-5">
+    <div className="w-full max-w-[300px] sm:max-w-[500px] lg:max-w-[900px] xl:max-w-[1200px] h-fit mx-auto flex flex-col  gap-5 mt-5">
       <h1 className="text-3xl place-self-center">Profile Setting</h1>
 
-      <div className="flex flex-row gap-5 mt-10 justify-center">
+      <div className="flex flex-col items-center sm:flex-row gap-5 mt-10 sm:justify-center">
         <div className="bg-white w-full max-w-[414px] h-fit shadow">
           <h2 className="p-2 border-b border-[var(--color-separator)] text-[var(--foreground-subTitle)]  bg-[#f8f8f9]">
             Profile Picture

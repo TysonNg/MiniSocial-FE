@@ -7,6 +7,7 @@ export interface CommentPayload{
     postId: string;
     content: string;
     parent_comment_id: string|null;
+    fromUserId: string;
 }
 export async function POST(request: NextRequest) {
   const api = await InstanceApi();

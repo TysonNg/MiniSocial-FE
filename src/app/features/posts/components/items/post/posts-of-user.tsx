@@ -12,7 +12,7 @@ export default function PostsOfUser({ posts }: { posts: PostInterface[] }) {
   const { openPostModal } = useModal();
 
   return (
-    <div className="max-w-[935px] flex flex-col mx-auto mt-10 border-t border-[var(--color-separator)]">
+    <div className="max-w-[315px] sm:max-w-[435px] lg:max-w-[735px] 2xl:max-w-[935px] flex flex-col mx-auto mt-10 border-t border-[var(--color-separator)]">
       <div className="place-self-center w-fit border-t border-black font-bold p-3 text-sm cursor-pointer">
         <span className="mr-1 cursor-pointer">
           <FontAwesomeIcon icon={faTableCellsLarge} size="sm" />
@@ -25,7 +25,7 @@ export default function PostsOfUser({ posts }: { posts: PostInterface[] }) {
             return (
               <div className="col-span-4" key={post.postId}>
                 <div
-                  className="relative w-[307px] h-[410px]"
+                  className="relative w-[105px] h-[110px] sm:w-[145px] sm:h-[210px] lg:w-[245px] lg:h-[310px] 2xl:w-[307px] 2xl:h-[410px]"
                   onClick={() => openPostModal(post)}
                 >
                   <div className="bg-black w-full h-full"></div>

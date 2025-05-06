@@ -7,8 +7,6 @@ import { redirect } from "next/navigation";
 export async function InstanceApi() {
   const cookieStore = await cookies();
 
-  console.log('NEXT_PUBLIC_API_URL',process.env.NEXT_PUBLIC_API_URL);
-  console.log('api-url',process.env.API_URL);
 
   
   const api = axios.create({
@@ -37,7 +35,7 @@ export async function InstanceApi() {
   },async(err) => {
     
     const originalRequest = err.config
-    console.log('orinalll', err.response);
+    console.log('orinalll', err);
     
     const status = err?.response?.status;
     const statusText = err?.response?.statusText;

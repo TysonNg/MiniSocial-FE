@@ -1,16 +1,22 @@
 "use client";
-import {  useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleLeft, faAngleRight } from "@fortawesome/free-solid-svg-icons";
+import {
+  faAngleLeft,
+  faAngleRight,
+  faEllipsisVertical,
+} from "@fortawesome/free-solid-svg-icons";
 import { useModal } from "@/app/context/modal.context";
 import { CommentPayload } from "@/app/api/post/comment/route";
-import formatTime from "@/app/ultils/format-time.ultil";
+import { formatTime } from "@/app/ultils/format-time.ultil";
 import { ShowMoreText } from "../../buttons/show-more-text";
 import { PostInterface } from "../../../interfaces/post.interface";
 import Link from "next/link";
 import { useFollow } from "@/app/context/follow.context";
+import { UpdatePostModal } from "../../modal/update-post-modal";
+import { useNotifySocket } from "@/app/hooks/useNotifySocket.hook";
 interface PostItemProps {
   post: PostInterface;
   i: number;
@@ -18,6 +24,7 @@ interface PostItemProps {
 
 export default function PostItem(props: PostItemProps) {
   const { post, i } = props;
+
   const imageRef: React.RefObject<HTMLDivElement | null> =
     useRef<HTMLDivElement | null>(null);
   const [isLike, setIsLike] = useState<boolean>(false);
@@ -26,11 +33,16 @@ export default function PostItem(props: PostItemProps) {
     content: "",
     parent_comment_id: null,
     postId: post.postId,
+    fromUserId: ''
   });
+  const [isPostSettings, setIsPostSettings] = useState<boolean>(false);
+  const [isUpdateModal, setIsUpdateModal] = useState<boolean>(false);
   const [isCommented, setIsCommented] = useState<boolean>(false);
   const [num, setNum] = useState<number>(1);
-  const [myId, setMyId] = useState<string>('');
+  const [myId, setMyId] = useState<string>("");
   const { isMyFollowed, toggleMyFollow } = useFollow();
+
+  const { notifySocket } = useNotifySocket();
 
   const handleForcusTextArea = () => {
     textareaRef.current?.focus();
@@ -40,11 +52,11 @@ export default function PostItem(props: PostItemProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const imgOffsetRef = useRef<number>(0);
 
-  const handleDoubleClick = (postId: string) => {
-    handleLikePost(postId)
+  const handleDoubleClick = (postId: string, post: PostInterface) => {
+    handleLikePost(postId, post);
   };
 
-  const handleLikePost = async (postId: string) => {
+  const handleLikePost = async (postId: string, post: PostInterface) => {
     if (!isLike) {
       const res = await fetch(`api/post/like-post`, {
         method: "POST",
@@ -53,6 +65,14 @@ export default function PostItem(props: PostItemProps) {
       const data = await res.json();
       setIsLike(!isLike);
       window.dispatchEvent(new Event("newLike"));
+
+      if (notifySocket && post.userId !== myId) {
+        notifySocket.emit("newLike", {
+          toUser: post.userId,
+          postId,
+        });
+      }
+
       return data;
     } else {
       const res = await fetch(`api/post/like-post?postId=${postId}`, {
@@ -63,6 +83,19 @@ export default function PostItem(props: PostItemProps) {
       window.dispatchEvent(new Event("newLike"));
       setIsLike(!isLike);
       return data;
+    }
+  };
+
+  const deletePost = async (postId: string) => {
+    const res = await fetch(`/api/post/delete-post`, {
+      method: "DELETE",
+      body: postId,
+    });
+    const data = await res.json();
+
+    if (data) {
+      alert(data.data.message);
+      location.reload();
     }
   };
 
@@ -108,6 +141,7 @@ export default function PostItem(props: PostItemProps) {
           content: "",
           parent_comment_id: null,
           postId: post.postId,
+          fromUserId: ''
         });
         setIsCommented(false);
       }, 1500);
@@ -119,6 +153,12 @@ export default function PostItem(props: PostItemProps) {
         },
       });
 
+      if (notifySocket && post.userId !== myId) {
+        notifySocket.emit("newCommentToPost", {
+          toUser: post.userId,
+          postId: post.postId,
+        });
+      }
       window.dispatchEvent(event);
     }
   };
@@ -134,18 +174,23 @@ export default function PostItem(props: PostItemProps) {
         method: "POST",
         body: userId,
       });
+
+      notifySocket?.emit('newFollow',{
+        toUser: userId,
+      })
     }
     toggleMyFollow(userId);
   };
 
   useEffect(() => {
+    if (!notifySocket) return;
     const setLike = async () => {
       const res = await fetch(
         `api/post/get-users-like-post?postId=${post.postId}`
       );
       const data = await res.json();
-      const { datas,userId } = data;
-      setMyId(userId)
+      const { datas, userId } = data;
+      setMyId(userId);
       setNumsOfLike(datas.users.length);
       setIsLike(data.isHaveUser);
     };
@@ -159,9 +204,8 @@ export default function PostItem(props: PostItemProps) {
     return () => {
       window.removeEventListener("newLike", setLike);
     };
-  }, []);
+  }, [notifySocket]);
 
- 
   return (
     <div
       key={post.postId}
@@ -193,31 +237,37 @@ export default function PostItem(props: PostItemProps) {
         <span className="mb-2 text-[#666]">.</span>
         <div
           className={`${
-            isMyFollowed(post.userId,"Followings") ? "px-1 text-[#666]" : "bg-[#0095F6] px-5 font-bold text-white"
-          } ${myId === post.userId? 'hidden':''} cursor-pointer hover:opacity-65 rounded-md text-sm`}
-          onClick={() => handleFollow(post.userId, isMyFollowed(post.userId,"Followings"))}
+            isMyFollowed(post.userId, "Followings")
+              ? "px-1 text-[#666]"
+              : "bg-[#0095F6] px-5 font-bold text-white"
+          } ${
+            myId === post.userId ? "hidden" : ""
+          } cursor-pointer hover:opacity-65 rounded-md text-sm`}
+          onClick={() =>
+            handleFollow(post.userId, isMyFollowed(post.userId, "Followings"))
+          }
         >
           <button className={` text-sm cursor-pointer`}>
-            {isMyFollowed(post.userId,"Followings") ? "Following" : "Follow"}
+            {isMyFollowed(post.userId, "Followings") ? "Following" : "Follow"}
           </button>
         </div>
       </div>
-      <div className=" relative overflow-clip w-[630px]">
+      <div className=" relative overflow-clip w-full max-w-[350px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[580px] xl:max-w-[630px]">
         <div
           ref={imageRef}
           className="relative flex flex-row transition-transform duration-300 "
         >
           {post.imgsUrl.map((img, i) => {
             return (
+              <div key={i} className="relative min-w-full aspect-[630/468]">
               <Image
-                key={i}
                 src={img}
                 alt="Post Image"
-                width={630}
-                height={468}
-                className="rounded-md"
-                onDoubleClick={() => handleDoubleClick(post.postId)}
+                fill
+                className="rounded-md object-cover"
+                onDoubleClick={() => handleDoubleClick(post.postId, post)}
               />
+            </div>
             );
           })}
         </div>
@@ -257,7 +307,7 @@ export default function PostItem(props: PostItemProps) {
           className={`text-2xl cursor-pointer active:scale-110 ${
             isLike ? "animate-like" : ""
           }`}
-          onClick={() => handleLikePost(post.postId)}
+          onClick={() => handleLikePost(post.postId, post)}
         >
           {isLike ? `❤️` : `🤍`}
         </div>
@@ -324,6 +374,54 @@ export default function PostItem(props: PostItemProps) {
           </button>
         )}
       </div>
+
+      {myId === post.userId && (
+        <>
+          <div
+            className={`${
+              i === 0 ? "top-6" : "top-2"
+            } absolute  right-5 cursor-pointer px-2`}
+            onClick={() => {
+              setIsPostSettings(!isPostSettings);
+            }}
+          >
+            <FontAwesomeIcon icon={faEllipsisVertical} />
+          </div>
+
+          {isPostSettings && (
+            <ul
+              className={`absolute ${
+                i === 0 ? "top-12" : "top-8"
+              } right-7 bg-white shadow-lg rounded-md w-32 overflow-hidden z-50`}
+            >
+              <li className="border-b border-gray-200">
+                <div
+                  onClick={() => deletePost(post.postId)}
+                  className="px-4 py-2 text-red-600 hover:bg-red-500 hover:text-white transition-colors duration-200 cursor-pointer"
+                >
+                  Delete
+                </div>
+              </li>
+              <li>
+                <div
+                  onClick={() => {
+                    setIsUpdateModal(true);
+                    setIsPostSettings(false);
+                  }}
+                  className="px-4 py-2 text-blue-600 hover:bg-blue-500 hover:text-white transition-colors duration-200 cursor-pointer"
+                >
+                  Update
+                </div>
+              </li>
+            </ul>
+          )}
+          <UpdatePostModal
+            post={post}
+            isUpdateModal={isUpdateModal}
+            setIsUpdateModal={setIsUpdateModal}
+          />
+        </>
+      )}
     </div>
   );
 }

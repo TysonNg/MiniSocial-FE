@@ -26,9 +26,9 @@ export default async function UserPage({ params }: { params: Promise<{userId: st
 
   return (
     <section className="w-full">
-      <div className="max-w-[630px] mx-auto py-10">
-        <div className="flex flex-row gap-10">
-          <div className="relative w-30 h-30 rounded-full">
+      <div className=" sm:max-w-[430px] 2xl:max-w-[630px] mx-auto py-10">
+        <div className="flex flex-row justify-center gap-5 sm:gap-10">
+          <div className="relative w-15 h-15 sm:w-30 sm:h-30 rounded-full">
             <Image
               src={user.avatarUrl}
               fill

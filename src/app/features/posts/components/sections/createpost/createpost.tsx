@@ -35,24 +35,22 @@ export default async function CreatePostSection() {
       <div className="grid grid-cols-12 p-2 justify-items-center text-[var(--foreground-subTitle)] text-sm font-bold">
         <CreateStoryOpenModal />
         <div
-          className=" col-span-4 px-6 py-2 rounded-lg cursor-pointer hover:bg-black/30 transition-colors duration-300"
+          className=" col-span-4 px-6 py-2 rounded-lg cursor-pointer hover:bg-black/30 transition-colors duration-300 text-xs sm:text-sm text-nowrap"
         >
           <span>
             <FontAwesomeIcon
               icon={faPhotoFilm}
-              className="mr-2 text-green-800"
-              size="lg"
+              className="mr-2 text-green-800 "
             />
           </span>
           Photos&Video
         </div>
    
-        <div className="col-span-4 px-6 py-2 rounded-lg cursor-pointer hover:bg-black/30 transition-colors duration-300">
+        <div className="col-span-4 px-6 py-2 rounded-lg cursor-pointer hover:bg-black/30 transition-colors duration-300 text-xs sm:text-sm text-nowrap">
           <span>
             <FontAwesomeIcon
               icon={faFaceSmile}
-              className="mr-2 text-yellow-800"
-              size="lg"
+              className="mr-2 text-yellow-800 "
             />
           </span>
           Reactions

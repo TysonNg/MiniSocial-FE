@@ -3,6 +3,7 @@
 import { createContext, useContext, useState } from "react";
 import { PostInterface } from "../features/posts/interfaces/post.interface";
 import { UserInterface } from "../features/users/interfaces/user.interface";
+import { useChatSocket } from "../hooks/useChatSocket.hook";
 
 interface ModalContextType {
   isModalOpen: boolean;
@@ -14,9 +15,8 @@ interface ModalContextType {
   isCreatePostModalOpen: boolean;
   isFollowModal: boolean;
   isChatModal: boolean;
-  selectedUser: UserInterface | null
-  isCreateStoryModalOpen: boolean
-  
+  selectedUser: UserInterface | null;
+  isCreateStoryModalOpen: boolean;
 
   openModal: () => void;
   closeModal: () => void;
@@ -34,8 +34,8 @@ interface ModalContextType {
   openChatModal: (user: UserInterface) => void;
   closeChatModal: () => void;
   openChatModalWithUser: (user: UserInterface) => void;
-  openCreateStoryModal:() => void;
-  closeCreateStoryModal:()=> void;
+  openCreateStoryModal: () => void;
+  closeCreateStoryModal: () => void;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -53,27 +53,36 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
     useState<boolean>(false);
 
   const [isChatModal, setIsChatModal] = useState<boolean>(false);
-  const [selectedUser, setSelectedUser] = useState<UserInterface|null>(null);
-  const [isCreateStoryModalOpen, setIsCreateStoryModalOpen] = useState<boolean>(false)
+  const [selectedUser, setSelectedUser] = useState<UserInterface | null>(null);
+  const [isCreateStoryModalOpen, setIsCreateStoryModalOpen] =
+    useState<boolean>(false);
+
+  const { socket } = useChatSocket();
 
   const openCreateStoryModal = () => {
-    setIsCreateStoryModalOpen(true)
-  }
+    setIsCreateStoryModalOpen(true);
+  };
 
   const closeCreateStoryModal = () => {
-    setIsCreateStoryModalOpen(false)
-  }
+    setIsCreateStoryModalOpen(false);
+  };
 
-  const openChatModalWithUser = (user : UserInterface) => {
-    setSelectedUser(user)
-    setIsChatModal(true)
-  }
+  const openChatModalWithUser = (user: UserInterface) => {
+    setSelectedUser(user);
+    setIsChatModal(true);
+  };
 
   const openChatModal = (user: UserInterface) => {
-    if(user.id !== selectedUser?.id){
+    if (user.id !== selectedUser?.id) {
       setSelectedUser(user);
     }
+    
+    socket?.emit("markMessagesAsRead", {
+      toId: selectedUser?.id,
+    });
+
     setIsChatModal(true);
+    window.dispatchEvent(new Event("seen"));
   };
 
   const closeChatModal = () => {
@@ -162,7 +171,7 @@ export function ModalProvider({ children }: { children: React.ReactNode }) {
         openChatModalWithUser,
         closeCreateStoryModal,
         openCreateStoryModal,
-        isCreateStoryModalOpen
+        isCreateStoryModalOpen,
       }}
     >
       {children}

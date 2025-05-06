@@ -8,7 +8,7 @@ import {
   faAngleRight,
   faCircleXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import formatTime from "@/app/ultils/format-time.ultil";
+import { formatTime } from "@/app/ultils/format-time.ultil";
 import { CommentPayload } from "@/app/api/post/comment/route";
 import { useReply } from "@/app/context/reply.context";
 import { buildCommentTree, CommentNode } from "@/app/ultils/comment-tree.ultil";
@@ -16,6 +16,8 @@ import PostReply from "../items/post/post-reply";
 import { CommentInterface } from "../../interfaces/post.interface";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import { useNotifySocket } from "@/app/hooks/useNotifySocket.hook";
+import { AuthSocket } from "@/app/shared/header/notify/notify.component";
 
 export default function PostModal() {
   const {
@@ -111,11 +113,13 @@ export default function PostModal() {
       return data;
     }
   };
+  const { notifySocket } = useNotifySocket();
 
   const [comment, setComment] = useState<CommentPayload>({
     content: "",
     parent_comment_id: null,
     postId: post?.postId || "",
+    fromUserId: "",
   });
 
   // handlePostComment
@@ -131,15 +135,24 @@ export default function PostModal() {
           content: comment.content,
           parent_comment_id: null,
           postId: post?.postId || "",
+          fromUserId: post?.userId || "",
         };
+
+    console.log("payload", payload);
 
     const res = await fetch(`api/post/comment`, {
       method: "POST",
       body: JSON.stringify(payload),
     });
     if (res.ok) {
-      const data = await res.json();
+      const data: CommentInterface = await res.json();
 
+      if (payload?.fromUserId !== (notifySocket?.auth as AuthSocket).userId) {
+        notifySocket?.emit("newReplyComment", {
+          toUser: payload?.fromUserId,
+          postId: data.postId,
+        });
+      }
       const newComments = [...comments, data];
       setComments(newComments);
       const enrichedComments = await addUsersDataToComments(newComments);
@@ -163,6 +176,7 @@ export default function PostModal() {
               content: "",
               parent_comment_id: null,
               postId: "",
+              fromUserId: "",
             },
           }));
         }
@@ -170,6 +184,7 @@ export default function PostModal() {
           content: "",
           parent_comment_id: null,
           postId: "",
+          fromUserId: "",
         });
         setIsCommented(false);
       }, 1500);
@@ -238,11 +253,11 @@ export default function PostModal() {
     >
       {/* Modal content */}
       <div
-        className="max-w-[1500px] w-full h-screen max-h-[1257px] bg-white flex flex-row"
+        className=" w-full h-screen max-w-[300px] max-h-fit sm:max-w-[500px] sm:max-h-[400px]  md:max-w-[700px] md:max-h-[600px] lg:max-w-[900px] lg:max-h-[700px] 2xl:max-w-[1500px] 2xl:max-h-[1257px] bg-white flex flex-col sm:flex-row"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Left side */}
-        <div className="w-[950px] relative overflow-clip">
+        <div className="w-[950px] max-w-[300px] max-h-[300px] sm:max-w-[500px] sm:max-h-[400px] md:max-w-[700px] md:max-h-[600px] lg:max-w-[900px] lg:max-h-[700px] 2xl:max-w-[1500px]  2xl:max-h-[1257px] relative overflow-clip">
           <div
             ref={imageRef}
             className="transition-transform flex flex-row duration-300 ease-in-out"
@@ -250,7 +265,7 @@ export default function PostModal() {
             {post.imgsUrl.map((img, i) => (
               <div
                 key={img}
-                className="w-full h-[1257px] relative flex-shrink-0"
+                className="w-full h-[1257px] max-w-[300px] max-h-[300px] sm:max-w-[500px] sm:max-h-[400px] md:max-w-[700px] md:max-h-[600px] lg:max-w-[900px] lg:max-h-[700px] 2xl:max-w-[1500px] 2xl:max-h-[1257px] relative flex-shrink-0"
               >
                 <Image
                   src={img}
@@ -289,7 +304,7 @@ export default function PostModal() {
         </div>
 
         {/* Right side */}
-        <div className="w-[550px] relative flex flex-col ">
+        <div className="w-full max-w-[300px] sm:max-w-[550px] relative flex flex-col ">
           {/* User and close btn */}
           <div className="flex flex-row items-center p-4 gap-3 border-b border-[var(--color-separator)]">
             <span className="w-8 h-8 relative rounded-full">
@@ -316,7 +331,7 @@ export default function PostModal() {
           </button>
 
           {/* Content section*/}
-          <section className="p-4 h-270 overflow-y-auto scrollbar-hide">
+          <section className="p-4  h-fit max-h-[250px] sm:max-h-270 overflow-y-auto scrollbar-hide">
             <div className="flex flex-row gap-3">
               <div className="w-8 h-8 relative rounded-full ">
                 <Image

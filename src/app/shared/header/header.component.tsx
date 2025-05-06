@@ -10,16 +10,18 @@ import { MessageComponent } from "./message/message.component";
 export default function Header() {
   return (
     <div className="w-full grid grid-cols-12 justify-between items-center bg-white text-black py-2 px-7 shadow-md sticky top-0 z-3">
-      <div className="col-span-4 w-[80px] flex flex-row gap-4 z-1 ">
+      <div className=" col-span-6 xs:col-span-4 w-[80px] flex flex-row gap-4 z-1 ">
         <LeftSidebarComponents />
-       
-          <Link href="/home" className="">
-            <p className="text-nowrap font-bold">Mini Social</p>
-          </Link>
+
+        <Link href="/home" className="">
+          <p className="text-xs sm:text-sm md:text-base text-nowrap font-bold">
+            Mini Social
+          </p>
+        </Link>
       </div>
-      <SearchBar />
-      <div className="col-span-4 flex flex-row gap-5 w-full justify-end">
-        
+    
+        <SearchBar />
+      <div className="relative col-span-6  xs:col-span-4 flex flex-row gap-2 sm:gap-3 md:gap-5 w-full justify-end">
         <MessageComponent />
         <NotifyComponent />
         <MyUserComponent />

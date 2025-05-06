@@ -2,7 +2,7 @@
 import dayjs from "dayjs";
 
 
-const formatTime = (timeStr: string) => {
+export const formatTime = (timeStr: string) => {
     const now = dayjs();
     const time = dayjs(timeStr);
     
@@ -16,5 +16,7 @@ const formatTime = (timeStr: string) => {
     return `${diffInHours} h`;
   };
 
-
-  export default formatTime;
+export const formatTimeToMinuteAndHour = (time: Date|string) => {
+  const d = dayjs(time);
+  return d.format("HH:mm")
+}

@@ -41,10 +41,12 @@
 }
 
 @theme {
+  --breakpoint-xs:38.75rem;
   --breakpoint-sm: 53.3rem;
   --breakpoint-md: 64rem;
   --breakpoint-lg: 85.3rem;
   --breakpoint-xl: 106.6rem;
+  --breakpoint-2xl: 128rem;
 }
 
 html {
