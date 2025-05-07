@@ -19,12 +19,12 @@ export const useNotifySocket = () => {
 
     const connectSocket = async () => {
       try {
-        const res = await fetch(`api/user/get-my-user`);
+        const res = await fetch(`/api/user/get-my-user`);
         const { token, userId: id } = await res.json();
 
         if (!token) return;
 
-        const resUser = await fetch(`api/user/find-user-by-id?userId=${id}`);
+        const resUser = await fetch(`/api/user/find-user-by-id?userId=${id}`);
         const user: UserInterface = await resUser.json();
 
         if (!user) return;

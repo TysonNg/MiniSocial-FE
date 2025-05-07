@@ -13,8 +13,14 @@ export const useChatSocket = () => {
     if (!userId) return;
     const connectSocket = async () => {
       try {
-        const res = await fetch(`api/user/get-my-user`);
+        const res = await fetch(`/api/user/get-my-user`,{
+          method: "GET"
+        });
 
+        
+        if(!res.ok){
+          throw new Error('Error to fetch')
+        }
         const data = await res.json();
 
         const { token, userId } = data;
@@ -24,7 +30,7 @@ export const useChatSocket = () => {
           return;
         }
         const resUser = await fetch(
-          `api/user/find-user-by-id?userId=${userId}`
+          `/api/user/find-user-by-id?userId=${userId}`
         );
         const user: UserInterface = await resUser.json();
         if (!user) return;
@@ -63,7 +69,7 @@ export const useChatSocket = () => {
           setConnected(false);
         });
       } catch (error) {
-        console.error("Failed to fetch user:", error);
+        console.error( error);
       }
     };
 
