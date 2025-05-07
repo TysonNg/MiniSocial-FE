@@ -27,6 +27,9 @@ export function FormLogin() {
       const res = await fetch("/api/user/login", {
         method: "POST",
         body: JSON.stringify(formLogin),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
       if(res.ok){
         const data = await res.json();
