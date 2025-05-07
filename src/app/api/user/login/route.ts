@@ -28,7 +28,8 @@ export async function POST(request: NextRequest) {
         httpOnly: true,
         maxAge: 60 * 60 * 24 * 7,
       });
-
+      console.log('resulttttDataLogin', result.data);
+      
       return NextResponse.json({
         metadata: result.data,
         message: "Login successfully!",
