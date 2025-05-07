@@ -331,7 +331,7 @@ export default function PostModal() {
           </button>
 
           {/* Content section*/}
-          <section className="p-4  h-fit max-h-[250px] sm:max-h-270 overflow-y-auto scrollbar-hide">
+          <section className="p-4  h-fit md:h-screen max-h-[250px] sm:max-h-270 overflow-y-auto scrollbar-hide">
             <div className="flex flex-row gap-3">
               <div className="w-8 h-8 relative rounded-full ">
                 <Image
