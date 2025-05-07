@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
   const cookieStore = await cookies();
   try {
     const result = await api.post("/auth/signIn", payload);
-    console.log('login',result);
     
     if (!result.data) throw new Error(`${result.data.message}`);
 

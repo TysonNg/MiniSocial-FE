@@ -28,20 +28,22 @@ export function FormLogin() {
         method: "POST",
         body: JSON.stringify(formLogin),
       });
-
-      const data = await res.json();
-      console.log("login", data.message);
-      if (data.message.length > 0) {
-        setMessage([data.message]);
+      if(res.ok){
+        const data = await res.json();
+        if (data.message.length > 0) {
+          setMessage([data.message]);
+        }
+        if (data.message === "Login successfully!") {
+          login(data.metadata.user.id);
+  
+          localStorage.setItem("username", data.metadata.user.name);
+          setTimeout(() => {
+            router.push("/home");
+          }, 1000);
+        }
       }
-      if (data.message === "Login successfully!") {
-        login(data.metadata.user.id);
-
-        localStorage.setItem("username", data.metadata.user.name);
-        setTimeout(() => {
-          router.push("/home");
-        }, 1000);
-      }
+      
+      
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
