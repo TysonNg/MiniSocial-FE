@@ -31,30 +31,27 @@ export function FormLogin() {
           "Content-Type": "application/json",
         },
       });
-      if(res.ok){
+      if (res.ok) {
         const data = await res.json();
-        
+
         if (data.message.length > 0) {
           setMessage([data.message]);
         }
         if (data.message === "Login successfully!") {
           login(data.metadata.user.id);
-  
+
           localStorage.setItem("username", data.metadata.user.name);
           setTimeout(() => {
             router.push("/home");
           }, 1000);
         }
       }
-      
-      
     } catch (error) {
       console.error("Login failed:", error);
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <form onSubmit={handleSubmit}>
@@ -111,6 +108,7 @@ export function FormSignUp() {
     email: "",
     password: "",
   });
+  const { login } = useAuth();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string[]>([""]);
@@ -126,18 +124,20 @@ export function FormSignUp() {
         body: JSON.stringify(formSignUp),
       });
       const data = await result.json();
-      if (
-        data.message === "Register successfully!" ||
-        data.message === "User already registed!!!"
-      ) {
-        setMessage([data.message]);
 
-        if (data.message === "Register successfully!") {
-          localStorage.setItem("username", formSignUp.name ?? "");
-          setTimeout(() => {
-            router.push("/home");
-          }, 1000);
+      if (data.message !== "Register successfully!") {
+        setMessage([data.message[0]]);
+        if(data.message === "User already registed!!!"){
+          setMessage([data.message])
         }
+      }
+      if (data.message === "Register successfully!") {
+        login(data.metadata.user.id);
+
+        localStorage.setItem("username", formSignUp.name ?? "");
+        setTimeout(() => {
+          router.push("/home");
+        }, 1000);
       }
     } catch (error) {
       console.error("SignUp failed:", error);
