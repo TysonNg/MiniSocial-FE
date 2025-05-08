@@ -6,8 +6,6 @@ import { redirect } from "next/navigation";
 
 export async function InstanceApi() {
   const cookieStore = await cookies();
-
-
   
   const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL??process.env.API_URL,

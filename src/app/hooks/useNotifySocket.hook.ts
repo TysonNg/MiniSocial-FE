@@ -14,7 +14,6 @@ export const useNotifySocket = () => {
     if (!userId ) return;
     if (socketRef.current) {
       socketRef.current.disconnect();
-      console.log("Socket disconnected before creating new one");
     }
 
     const connectSocket = async () => {
@@ -38,15 +37,11 @@ export const useNotifySocket = () => {
         
         socketRef.current = notifySocket;
         notifySocket.on("connect", () => {
-          console.log(
-            " Socket connected to notify namespace:",
-            notifySocket.id
-          );
+         
           setConnected(true);
         });
 
         notifySocket.on("disconnect", () => {
-          console.log("Socket notify disconnected");
           setConnected(false);
         });
 

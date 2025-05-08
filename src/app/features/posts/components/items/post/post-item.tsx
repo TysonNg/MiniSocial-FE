@@ -355,6 +355,12 @@ export default function PostItem(props: PostItemProps) {
               postId: post.postId,
             }))
           }
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handlePostComment();
+            }
+          }}
           value={comment?.content || ""}
           rows={2}
         />

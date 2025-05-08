@@ -56,7 +56,6 @@ export const useChatSocket = () => {
         socketRef.current = socket;
 
         socket.on("connect", () => {
-          console.log(" Socket connected:", socket.id);
           setConnected(true);
         });
 
@@ -65,7 +64,6 @@ export const useChatSocket = () => {
         });
 
         socket.on("disconnect", () => {
-          console.log(" Socket disconnected");
           setConnected(false);
         });
       } catch (error) {

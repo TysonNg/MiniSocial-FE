@@ -73,7 +73,6 @@ export default function CreatePostModal({ user }: { user: UserInterface }) {
       })
       if(res.ok){
         const data = await res.json()
-        console.log('creatPost', data);
         window.dispatchEvent(new Event('newPost'))
         closeCreatePostModal()
         return data

@@ -138,7 +138,6 @@ export default function PostModal() {
           fromUserId: post?.userId || "",
         };
 
-    console.log("payload", payload);
 
     const res = await fetch(`api/post/comment`, {
       method: "POST",
@@ -148,10 +147,18 @@ export default function PostModal() {
       const data: CommentInterface = await res.json();
 
       if (payload?.fromUserId !== (notifySocket?.auth as AuthSocket).userId) {
-        notifySocket?.emit("newReplyComment", {
-          toUser: payload?.fromUserId,
-          postId: data.postId,
-        });
+        if(payload?.parent_comment_id === null){
+          notifySocket?.emit("newCommentToPost", {
+            toUser: payload?.fromUserId,
+            postId: data.postId,
+          });
+        }else{
+          notifySocket?.emit("newReplyComment", {
+            toUser: payload?.fromUserId,
+            postId: data.postId,
+          });
+        }
+        
       }
       const newComments = [...comments, data];
       setComments(newComments);
@@ -423,6 +430,12 @@ export default function PostModal() {
                     content: value,
                     postId: post.postId,
                   }));
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handlePostComment();
                 }
               }}
               value={

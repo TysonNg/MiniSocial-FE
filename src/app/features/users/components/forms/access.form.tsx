@@ -33,7 +33,6 @@ export function FormLogin() {
       });
       if(res.ok){
         const data = await res.json();
-        console.log('data',data);
         
         if (data.message.length > 0) {
           setMessage([data.message]);
