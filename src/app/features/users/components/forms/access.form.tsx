@@ -73,7 +73,7 @@ export function FormLogin() {
         <p className="text-[var(--foreground-subTitle)]">Password</p>
         <span>
           <input
-            type="text"
+            type="password"
             name="password"
             className="border-b outline-0 w-full py-1"
             onChange={(e) =>
@@ -174,7 +174,7 @@ export function FormSignUp() {
         <p className="text-[var(--foreground-subTitle)]">Password</p>
         <span>
           <input
-            type="text"
+            type="password"
             name="password"
             className="border-b outline-0 w-full py-1"
             onChange={(e) =>
